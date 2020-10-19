@@ -26,7 +26,6 @@ function App() {
   const [user] = useAuthState(auth);
   const [query, setQuery] = useState(messagesRef.orderBy('createdAt').limit(10));
   const [allMsg, setAllMsg] = useState(false);
-  console.log('~~~', user);
 
   const getAllMsg = (e) => { 
     e.preventDefault();
