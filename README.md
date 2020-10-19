@@ -2,7 +2,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Live Demo
 
-[React Chat with Firebase]().
+[Lets Talk Dude Chat](https://lets-talk-dude.web.app/).
 
 ## Available Scripts
 

@@ -26,6 +26,7 @@ function App() {
   const [user] = useAuthState(auth);
   const [query, setQuery] = useState(messagesRef.orderBy('createdAt').limit(10));
   const [allMsg, setAllMsg] = useState(false);
+  console.log('~~~', user);
 
   const getAllMsg = (e) => { 
     e.preventDefault();
@@ -44,9 +45,9 @@ function App() {
         <SignOut getAllMsg={getAllMsg} allMsg={allMsg} />
       </header>
       <section>
-        { user ?
-          <Route path="/chat" component={() => <ChatRoom query={query} />} />
-          : <Route path="/" exact component={SignIn} />
+        { !user ?
+          <Route path="/" exact component={SignIn} />
+          : <Route path="/chat" component={() => <ChatRoom query={query} />} />
         }
       </section>
     </div>
