@@ -1,5 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
+import { NavLink, Route } from 'react-router-dom';
 
 import firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -19,11 +20,19 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 const firestore = firebase.firestore();
-
+const messagesRef = firestore.collection('messages');
 
 function App() {
   const [user] = useAuthState(auth);
+  const [query, setQuery] = useState(messagesRef.orderBy('createdAt').limit(10));
+  const [allMsg, setAllMsg] = useState(false);
 
+  const getAllMsg = (e) => { 
+    e.preventDefault();
+    const dataQuery = messagesRef.orderBy('createdAt');
+    allMsg ? setQuery(dataQuery.limit(10)) : setQuery(dataQuery);
+    setAllMsg(prev => prev = !prev);
+  }
   return (
     <div className="App">
       <header>
@@ -32,10 +41,13 @@ function App() {
           <span className="grey">d</span>
           <span className="blue">way</span>
         </h1>
-        <SignOut />
+        <SignOut getAllMsg={getAllMsg} allMsg={allMsg} />
       </header>
       <section>
-        {user ? <ChatRoom /> : <SignIn />}
+        { user ?
+          <Route path="/chat" component={() => <ChatRoom query={query} />} />
+          : <Route path="/" exact component={SignIn} />
+        }
       </section>
     </div>
   );
@@ -49,29 +61,30 @@ function SignIn() {
   
   return (
     <div>
-        <button onClick={signInWithGoogle}>Войти с помощью Google</button>
+      <NavLink to="/chat" className="sign-in" onClick={signInWithGoogle}>Войти с помощью Google</NavLink>
     </div>
   )
 }
 
-function SignOut() {
+function SignOut(props) {
   return auth.currentUser && (
     <div>
-        <button onClick={() => auth.signOut}>Покинуть чат</button>
+      <button className="sign-in" onClick={props.getAllMsg}>{props.allMsg ? '10 последних' : 'Все сообщения' }</button>
+      <NavLink to="/" className="sign-out" onClick={() => auth.signOut()}>Покинуть чат</NavLink>
     </div>
   )
 }
 
-function ChatRoom() {
+function ChatRoom(props) {
   const dum = useRef();
 
-  const messagesRef = firestore.collection('messages');
-  const query = messagesRef.orderBy('createdAt').limit(10);
-  const [messages] = useCollectionData(query, {idField: 'id'});
-
-  const [msgCollection, setMsgCollection] = useState(messages);
-
   const [formValue, setFormValue] = useState('');
+  const [msgCollection, setMsgCollection] = useState([]);
+  const [messages] = useCollectionData(props.query, {idField: 'id'});
+
+  useEffect(() => {
+    setMsgCollection(messages);
+  })
 
   const sendMessage = async(e) => {
     e.preventDefault();
@@ -101,17 +114,15 @@ function ChatRoom() {
   )
 }
 
-function ChatMassage(props) {
+export function ChatMassage(props) {
   const {text, uid, photoURL, id} = props.message;
 
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
   const deletedMessageClass = text ? '' : 'deleted';
   const deleteMessage = async() => {
-    // e.preventDefault();
     firestore.collection('messages').doc(props.message.id).update({
       text: '',
     })
-    console.log('~~~', id);
   }
   return (
     <div className={`message ${messageClass}`}>

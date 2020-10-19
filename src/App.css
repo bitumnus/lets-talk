@@ -90,9 +90,9 @@ input {
   padding: 0 10px;
 }
 
-button {
-  background-color: #282c34; /* Green */
-  border: none;
+a.active {
+  background-color: #282c34; 
+  border: 2px solid #181717;
   color: white;
   padding: 15px 32px;
   text-align: center;
@@ -109,10 +109,15 @@ button:disabled {
 
 
 .sign-in {
-  color: #282c34;
-  background: white;
-  max-width: 400px;
-  margin: 0 auto;
+  background-color: #282c34; 
+  border: 2px solid #181717;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 1.25rem;
 }
 
 
